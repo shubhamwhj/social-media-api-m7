@@ -235,4 +235,58 @@ router.get("/getComments/:appId/:feedId", async (req, res) => {
 	}
 });
 
+/*
+    Get Feeds API endpoint: http://host/api/feeds/getUsers/:appId
+    method: GET
+*/
+router.get("/getUsers/:appId", 
+    async (req, res) => {
+        try {
+            const { appId } = req.params;
+            console.log(appId)
+
+            const usersRef = fireStore.collection('users');
+            const snapshot = await usersRef.where('appId', '==', appId).get();
+            if (snapshot.empty) {
+                return res.status(200).json({ "users": "No users found" });
+            }  
+            let usersData = []
+            snapshot.forEach(doc => {
+                usersData.push(doc.data())
+            });
+            return res.status(200).json({ "users": usersData });
+        }
+        catch (error){
+            console.log(error.message)
+            res.status(500).send({ "error_message ": "Pass valid appId" })
+        }
+});
+/*
+    Get Feeds API endpoint: http://host/api/feeds/getComments/:appId
+    method: GET
+*/
+router.get("/getComments/:appId", 
+    async (req, res) => {
+        try {
+            const { appId } = req.params;
+            console.log(appId)
+
+            const commentsRef = fireStore.collection('comments');
+            const snapshot = await commentsRef.where('appId', '==', appId).get();
+            if (snapshot.empty) {
+                return res.status(200).json({ "comments": "No comments found" });
+            }  
+            let commentsData = []
+            snapshot.forEach(doc => {
+                commentsData.push(doc.data())
+            });
+            return res.status(200).json({ "comments": commentsData });
+        }
+        catch (error){
+            console.log(error.message)
+            res.status(500).send({ "error_message ": "Pass valid appId" })
+        }
+});
+
+
 module.exports = router
