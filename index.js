@@ -8,8 +8,7 @@ app.use(express.urlencoded({limit: '50mb'}));
 const cors = require('cors');
 // Use this to allow CROS request. Add domain of the hosted frontend app.
 app.use(cors({
-  origin: 'https://bfs-dev.tynker.com',
-  origin: 'https://snack-web-player.s3.us-west-1.amazonaws.com'
+  origin: ['https://bfs-dev.tynker.com', 'https://snack-web-player.s3.us-west-1.amazonaws.com']
 }));
 
 app.get('/', (req, res) => {
