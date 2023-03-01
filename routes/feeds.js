@@ -288,5 +288,92 @@ router.get("/getComments/:appId",
         }
 });
 
+/*
+    Add Reply API endpoint: http://host/api/feeds/addReply
+    method: POST
+    {caption} : required
+*/
+router.post(
+	"/addReply",
+	body("reply", "Invalid reply").isLength({ min: 1 }),
+	async (req, res) => {
+		const errors = validationResult(req);
+		if (!errors.isEmpty()) {
+			const myError = errors["errors"][0]["msg"];
+			return res.status(400).json({ errorMessage: myError });
+		}
+
+		try {
+			const { commentId, reply, userId } = req.body;
+
+			const createReplyId = await fireStore.collection("replies").doc();
+
+			await createReplyId.set({
+				replyId: createReplyId.id,
+				commentId: commentId,
+				reply: reply,
+				userId: userId ? userId : "",
+				timeStamp: FieldValue.serverTimestamp(),
+			});
+
+			res
+				.status(200)
+				.send({ data: {}, successMessage: "Reply added successfully" });
+		} catch (error) {
+			// console.log(error.message)
+			res.status(500).send({ errorMessage: "Pass valid values" });
+		}
+	}
+);
+
+
+/*
+    Get Replies API endpoint: http://host/api/feeds/getReplies/:replyId
+    method: GET
+*/
+router.get("/getReplies/:commentId", async (req, res) => {
+	try {
+		const {commentId} = req.params;
+
+        console.log(commentId)
+		const repliesRef = fireStore.collection("replies");
+		const snapshot = await repliesRef
+			.where("commentId", "==", commentId)
+			.get();
+            
+		if (snapshot.empty) {
+			return res
+				.status(200)
+				.json({ comments: [], successMessage: "No replies found" });
+		}
+
+		let repliesData = [];
+
+		snapshot.forEach((doc) => {
+			repliesData.push(doc.data());
+		});
+		let updatedRepliesData = [];
+		for (let reply of repliesData) {
+			let userId = reply["userId"];
+
+			if (userId) {
+				let userRef = await fireStore.collection("users").doc(userId).get();
+				let user = userRef.data();
+				reply["username"] = user["username"];
+				reply["profileImage"] = user["profileImage"];
+				updatedRepliesData.push(reply);
+			} else {
+				reply["username"] = "Added by app";
+				reply["profileImage"] =
+					"https://procodingclass.github.io/tynker-vr-gamers-assets/assets/defaultProfileImage.png";
+				updatedRepliesData.push(reply);
+			}
+		}
+
+		 return res.status(200).json({ replies: updatedRepliesData });
+	} catch (error) {
+		res.status(500).send({ errorMessage: "Pass valid appId" });
+	}
+});
 
 module.exports = router
