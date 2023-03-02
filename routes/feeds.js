@@ -344,7 +344,7 @@ router.get("/getReplies/:commentId", async (req, res) => {
 		if (snapshot.empty) {
 			return res
 				.status(200)
-				.json({ comments: [], successMessage: "No replies found" });
+				.json({ replies: [], successMessage: "No replies found" });
 		}
 
 		let repliesData = [];
