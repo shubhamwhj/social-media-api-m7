@@ -376,4 +376,45 @@ router.get("/getReplies/:commentId", async (req, res) => {
 	}
 });
 
+/*
+	Get Comments API endpoint: http://host/api/feeds/deleteFeed
+	method: DELETE
+	{appId, feedId} : required
+	{userId} : optional
+*/
+router.delete(
+	"/deleteFeed",
+	body("feedId", "Invalid feed Id").isLength({ min: 2 }),
+	async (req, res) => {
+		const errors = validationResult(req);
+		if (!errors.isEmpty()) {
+			const myError = errors["errors"][0]["msg"];
+			return res.status(400).json({ errorMessage: myError });
+		}
+
+		try {
+			const { feedId } = req.body;
+
+			const deleteFeedQuery = await fireStore
+				.collection("feeds")
+				.doc(feedId)
+				.delete();
+
+			let deleteCommentQuery = await fireStore
+				.collection("comments")
+				.where("feedId", "==", feedId)
+				.get();
+			
+			await deleteCommentQuery.forEach((doc) => {
+				doc.ref.delete();
+			});
+
+			res.status(200).send({ successMessage: "Feed deleted successfully" });
+		} catch (error) {
+			console.log(error)
+			res.status(500).send({ errorMessage: "Pass valid values" });
+		}
+	}
+);
+
 module.exports = router
