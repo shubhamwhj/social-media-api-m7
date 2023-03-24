@@ -219,8 +219,7 @@ router.post(
 	body("appId", "Invalid app Id").isLength({ min: 2 }),
 	body("name", "Invalid Full Name").isLength({ min: 2 }),
 	body("userId", "Invalid User Id").isLength({ min: 2 }),
-	body("profileImage", "Invalid profile image").isLength({ min: 2 }),
-	body("bio", "Profile bio should be at least 5 characters long").isLength({ min: 5 }),
+	body("profileImage", "Invalid profile image").isLength({ min: 2 })
     async (req, res) => {
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
