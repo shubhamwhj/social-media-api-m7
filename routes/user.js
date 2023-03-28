@@ -47,6 +47,18 @@ router.post(
 					bio: "",
 				}
 			         );
+				
+				
+						  const newSnapshot = usersRef
+							.where("username", "==", username)
+							.where("appId", "==", appId)
+							.get();
+						  let userDetails = {};
+						newSnapshot.forEach((doc) => {
+							userDetails = doc.data();
+						});
+						return res.status(200).json({ user: userDetails });
+
 
 				
 
