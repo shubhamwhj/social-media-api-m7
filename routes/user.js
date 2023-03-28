@@ -45,11 +45,29 @@ router.post(
 					latitude: "",
 					longitude: "",
 					bio: "",
-				}
-			         );
-				
-				
-						  const newSnapshot = usersRef
+				} );
+				// , (error) => {
+				// 	  if (error) {
+				// 	    // The write failed...
+				// 	    return res.status(400).json({ errorMessage: "User can not be created" });
+				// 	  } else {
+				// 	    // Data saved successfully!
+				// 		//   const newSnapshot = usersRef
+				// 		// 	.where("username", "==", username)
+				// 		// 	.where("appId", "==", appId)
+				// 		// 	.get();
+				// 		//   let userDetails = {};
+				// 		// newSnapshot.forEach((doc) => {
+				// 		// 	userDetails = doc.data();
+				// 		// });
+				// 		// return res.status(200).json({ user: userDetails });
+				// 		return res.status(200).json({ errorMessage: "User details fetched" });
+
+				// 	  }
+				// 	}
+			     
+
+						  const newSnapshot = await usersRef
 							.where("username", "==", username)
 							.where("appId", "==", appId)
 							.get();
@@ -58,7 +76,7 @@ router.post(
 							userDetails = doc.data();
 						});
 						return res.status(200).json({ user: userDetails });
-
+						return res.status(200).json({ errorMessage: "User details fetched" });	 
 
 				
 
