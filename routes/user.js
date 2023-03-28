@@ -51,7 +51,7 @@ router.post(
 					    return res.status(400).json({ errorMessage: "User can not be created" });
 					  } else {
 					    // Data saved successfully!
-						  const newSnapshot = await usersRef
+						  const newSnapshot = usersRef
 							.where("username", "==", username)
 							.where("appId", "==", appId)
 							.get();
