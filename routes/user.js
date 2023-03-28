@@ -45,18 +45,28 @@ router.post(
 					latitude: "",
 					longitude: "",
 					bio: "",
-				});
+				}, (error) => {
+					  if (error) {
+					    // The write failed...
+					    return res.status(400).json({ errorMessage: "User can not be created" });
+					  } else {
+					    // Data saved successfully!
+						  const newSnapshot = await usersRef
+							.where("username", "==", username)
+							.where("appId", "==", appId)
+							.get();
+						  let userDetails = {};
+						newSnapshot.forEach((doc) => {
+							userDetails = doc.data();
+						});
+						return res.status(200).json({ user: userDetails });
+					  }
+					}
+			         );
 
-				const newSnapshot = await usersRef
-					.where("username", "==", username)
-					.where("appId", "==", appId)
-					.get();
+				
 
-				let userDetails = {};
-				newSnapshot.forEach((doc) => {
-					userDetails = doc.data();
-				});
-				return res.status(200).json({ user: userDetails });
+				
 			}
 			return res.status(400).json({ errorMessage: "Username already exist" });
 		} catch (error) {
