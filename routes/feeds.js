@@ -109,10 +109,10 @@ router.get("/getFeeds/:appId", async (req, res) => {
 });
 
 /*
-    Get MyFeeds API endpoint: http://host/api/feeds/getMyFeeds/:appId
+    Get MyFeeds API endpoint: http://host/api/feeds/getMyFeeds/:appId/:userid
     method: GET
 */
-router.get("/getMyFeeds/:appId", async (req, res) => {
+router.get("/getMyFeeds/:appId/:userId", async (req, res) => {
 	try {
 		const { appId, userId} = req.params;
 
