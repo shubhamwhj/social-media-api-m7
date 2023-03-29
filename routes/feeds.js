@@ -107,6 +107,58 @@ router.get("/getFeeds/:appId", async (req, res) => {
 		res.status(500).send({ errorMessage: "Pass valid values" });
 	}
 });
+
+/*
+    Get MyFeeds API endpoint: http://host/api/feeds/getMyFeeds/:appId
+    method: GET
+*/
+router.get("/getMyFeeds/:appId", async (req, res) => {
+	try {
+		const { appId, userId} = req.params;
+
+		const snapshot = await fireStore
+			.collection("feeds")
+			.where("appId", "==", appId)
+			.where("userId", "==", userId)
+			.orderBy('timeStamp', 'desc')
+			.get();
+
+		if (snapshot.empty) {
+			return res
+				.status(200)
+				.json({ feeds: [], successMessage: "No feeds found!" });
+		}
+
+		let feedsData = [];
+
+		snapshot.forEach((doc) => {
+			feedsData.push(doc.data());
+		});
+
+		let updatedFeeds = [];
+		for (let feed of feedsData) {
+			let userId = feed["userId"];
+
+			if (userId) {
+				let userRef = await fireStore.collection("users").doc(userId).get();
+				let user = userRef.data();
+				feed["username"] = user["username"];
+				feed["profileImage"] = user["profileImage"];
+				updatedFeeds.push(feed);
+			} else {
+				feed["username"] = "Added by app";
+				feed["profileImage"] =
+					"https://procodingclass.github.io/tynker-vr-gamers-assets/assets/defaultProfileImage.png";
+				updatedFeeds.push(feed);
+			}
+		}
+        console.log(updatedFeeds)
+		return res.status(200).json({ feeds: updatedFeeds });
+	} catch (error) {
+		console.log(error.message);
+		res.status(500).send({ errorMessage: "Pass valid values" });
+	}
+});
 /*
     likeFeed API endpoint: http://host/api/feeds/likeFeed/
     method: POST
